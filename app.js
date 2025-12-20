@@ -3,24 +3,18 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+// IMPORT CONFIG DARI FILE TERPISAH
+import CONFIG from './config.js'; 
 
-// 1. Config Firebase 
-const firebaseConfig = {
-    apiKey: "AIzaSyDnajbZduUkwavot9Wysx_4UdACLwWKrjo",
-    authDomain: "student-task-manager-de5e5.firebaseapp.com",
-    projectId: "student-task-manager-de5e5",
-    storageBucket: "student-task-manager-de5e5.firebasestorage.app",
-    messagingSenderId: "248132812112",
-    appId: "1:248132812112:web:64bab4cbcff2cc59530055",
-    measurementId: "G-JYDPZLDHB6"
-};
+// ============================================
+// ⚠️ KONFIGURASI (Mengambil dari file config.js)
+// ============================================
 
+const firebaseConfig = CONFIG.FIREBASE;
+const geminiApiKey = CONFIG.GEMINI.apiKey;
 
+// ============================================
 
-// 2. API Key Gemini
-const geminiApiKey = "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc";
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);

@@ -67,3 +67,11 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Abaikan file konfigurasi rahasia
+config.js
+
+# Abaikan file sistem/ide
+.DS_Store
+node_modules/
+.firebase/
