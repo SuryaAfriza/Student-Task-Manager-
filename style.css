@@ -1,0 +1,42 @@
+/* Kustomisasi Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb {
+    background: #c7c7c7; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8; 
+}
+
+/* Animasi Fade In */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style untuk konten Markdown hasil AI */
+.prose ul {
+    list-style-type: disc;
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+}
+.prose ol {
+    list-style-type: decimal;
+    padding-left: 1.5em;
+    margin-bottom: 1em;
+}
+.prose p {
+    margin-bottom: 0.8em;
+}
+.prose strong {
+    font-weight: 700;
+    color: #4f46e5;
+}
