@@ -3,11 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// ============================================
-// ⚠️ KONFIGURASI (WAJIB DIISI)
-// ============================================
 
-// 1. Config Firebase (Paste Config Kamu Di Sini)
+// 1. Config Firebase 
 const firebaseConfig = {
     apiKey: "AIzaSyDnajbZduUkwavot9Wysx_4UdACLwWKrjo",
     authDomain: "student-task-manager-de5e5.firebaseapp.com",
@@ -18,7 +15,8 @@ const firebaseConfig = {
     measurementId: "G-JYDPZLDHB6"
 };
 
-
+// 2. API Key Gemini
+const geminiApiKey = "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -147,3 +145,181 @@ window.deleteTask = async () => {
     await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'tasks', taskToDeleteId));
     closeDeleteModal();
 };
+
+// --- Gemini AI Functions ---
+
+window.generateDescriptionAI = async () => {
+    const title = document.getElementById('task-title').value;
+    if (!title) {
+        alert("Harap isi Judul Tugas terlebih dahulu agar AI bisa membuat rencana.");
+        return;
+    }
+    
+    if (!geminiApiKey || geminiApiKey === "ISI_GEMINI_API_KEY_DISINI") {
+        alert("API Key Gemini belum diisi! Edit file app.js baris 21.");
+        return;
+    }
+
+    const loading = document.getElementById('ai-loading-input');
+    const descField = document.getElementById('task-desc');
+    loading.classList.remove('hidden');
+
+    const prompt = `Bertindaklah sebagai asisten belajar mahasiswa yang cerdas. Pengguna memiliki tugas kuliah berjudul: "${title}". 
+    Buatkan rencana pengerjaan singkat (maksimal 5 poin) dan 1 tips belajar yang relevan.
+    Format dalam bentuk bullet points yang rapi. Gunakan Bahasa Indonesia.`;
+
+    try {
+        const response = await callGeminiAPI(prompt);
+        descField.value = response;
+    } catch (error) {
+        console.error("AI Error:", error);
+        alert("Maaf, AI sedang sibuk atau kunci API salah.");
+    } finally {
+        loading.classList.add('hidden');
+    }
+};
+
+window.askAI = async (id) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    if (!geminiApiKey || geminiApiKey === "ISI_GEMINI_API_KEY_DISINI") {
+        alert("API Key Gemini belum diisi! Edit file app.js baris 21.");
+        return;
+    }
+
+    const modal = document.getElementById('ai-modal');
+    const content = document.getElementById('ai-content');
+    
+    modal.classList.remove('hidden');
+    content.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-8 space-y-4">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+            <p class="text-purple-600 font-medium animate-pulse">Sedang menganalisis tugas "${task.title}"...</p>
+        </div>
+    `;
+
+    const prompt = `Bertindaklah sebagai tutor pribadi. Siswa ini memiliki tugas:
+    Judul: ${task.title}
+    Deskripsi: ${task.description || "Tidak ada deskripsi"}
+    Prioritas: ${task.priority}
+    
+    Berikan 3 hal:
+    1. Strategi konkret untuk menyelesaikan tugas ini.
+    2. Ide atau kata kunci pencarian yang berguna untuk referensi.
+    3. Kalimat motivasi singkat agar semangat.
+    
+    Gunakan format Markdown (bold, list) agar mudah dibaca. Bahasa Indonesia.`;
+
+    try {
+        const response = await callGeminiAPI(prompt);
+        content.innerHTML = marked.parse(response);
+    } catch (error) {
+        content.innerHTML = `<p class="text-red-500 text-center">Gagal menghubungi AI. ${error.message}</p>`;
+    }
+};
+
+async function callGeminiAPI(userPrompt) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${geminiApiKey}`;
+    const payload = {
+        contents: [{ parts: [{ text: userPrompt }] }]
+    };
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Tidak ada respon dari AI.";
+}
+
+// --- UI Helper Functions ---
+
+window.renderTasks = () => {
+    const container = document.getElementById('task-list');
+    const filterValue = document.getElementById('filter-priority').value;
+    container.innerHTML = '';
+
+    let filtered = tasks;
+    if (filterValue !== 'all') filtered = tasks.filter(t => t.priority === filterValue);
+    
+    filtered.sort((a, b) => (a.isCompleted - b.isCompleted) || new Date(a.dueDate) - new Date(b.dueDate));
+
+    if (filtered.length === 0) {
+        document.getElementById('empty-state').classList.remove('hidden');
+        return;
+    }
+    document.getElementById('empty-state').classList.add('hidden');
+
+    filtered.forEach(task => {
+        const isLate = !task.isCompleted && new Date(task.dueDate) < new Date().setHours(0,0,0,0);
+        const priorityColor = task.priority === 'Tinggi' ? 'bg-red-500' : (task.priority === 'Sedang' ? 'bg-yellow-500' : 'bg-blue-500');
+        
+        const div = document.createElement('div');
+        div.className = `bg-white rounded-xl shadow-sm border border-gray-100 p-5 transition hover:shadow-md relative group ${task.isCompleted ? 'opacity-75 bg-gray-50' : ''}`;
+        div.innerHTML = `
+            <div class="absolute top-0 left-0 w-1 h-full ${priorityColor}"></div>
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-xs font-bold px-2 py-1 rounded bg-gray-100 text-gray-600 uppercase tracking-wide">${task.priority}</span>
+                <div class="flex space-x-1">
+                    <button onclick="editTask('${task.id}')" class="text-gray-400 hover:text-indigo-600 p-1"><i class="fas fa-edit"></i></button>
+                    <button onclick="confirmDelete('${task.id}')" class="text-gray-400 hover:text-red-600 p-1"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <h3 class="font-bold text-lg text-gray-800 mb-1 ${task.isCompleted ? 'line-through text-gray-500' : ''}">${escapeHtml(task.title)}</h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2 h-10">${escapeHtml(task.description || '-')}</p>
+            
+            <button onclick="askAI('${task.id}')" class="w-full mb-3 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 text-purple-700 text-xs font-bold py-1.5 rounded border border-purple-100 flex items-center justify-center space-x-1 transition">
+                <i class="fas fa-sparkles text-yellow-500"></i>
+                <span>Tips AI Tutor</span>
+            </button>
+
+            <div class="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+                <div class="text-sm ${isLate ? 'text-red-500 font-semibold' : 'text-gray-500'}">
+                    <i class="far fa-calendar-alt mr-1"></i> ${formatDate(task.dueDate)}
+                </div>
+                <button onclick="toggleComplete('${task.id}', ${task.isCompleted})" class="px-3 py-1.5 rounded-full text-xs font-bold transition ${task.isCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                    <i class="fas ${task.isCompleted ? 'fa-check-circle' : 'fa-circle'}"></i> ${task.isCompleted ? 'Selesai' : 'Selesai?'}
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+};
+
+window.openModal = () => {
+    document.getElementById('task-form').reset();
+    document.getElementById('task-id').value = '';
+    document.getElementById('modal-title').innerText = 'Tambah Tugas Baru';
+    document.getElementById('task-modal').classList.remove('hidden');
+};
+window.closeModal = () => document.getElementById('task-modal').classList.add('hidden');
+window.closeAIModal = () => document.getElementById('ai-modal').classList.add('hidden');
+
+window.editTask = (id) => {
+    const t = tasks.find(x => x.id === id);
+    if(t) {
+        document.getElementById('task-id').value = t.id;
+        document.getElementById('task-title').value = t.title;
+        document.getElementById('task-desc').value = t.description;
+        document.getElementById('task-date').value = t.dueDate;
+        document.getElementById('task-priority').value = t.priority;
+        document.getElementById('modal-title').innerText = 'Edit Tugas';
+        document.getElementById('task-modal').classList.remove('hidden');
+    }
+};
+
+window.confirmDelete = (id) => { taskToDeleteId = id; document.getElementById('delete-modal').classList.remove('hidden'); };
+window.closeDeleteModal = () => document.getElementById('delete-modal').classList.add('hidden');
+window.filterTasks = () => window.renderTasks();
+window.updateStats = () => {
+    document.getElementById('total-tasks').innerText = tasks.length;
+    document.getElementById('pending-tasks').innerText = tasks.filter(t => !t.isCompleted).length;
+    document.getElementById('completed-tasks').innerText = tasks.filter(t => t.isCompleted).length;
+};
+
+function formatDate(d) { if(!d) return '-'; return new Date(d).toLocaleDateString('id-ID', {day:'numeric', month:'short'}); }
+function escapeHtml(t) { if(!t) return ""; return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
