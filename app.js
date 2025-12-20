@@ -1,6 +1,6 @@
 // --- Import Modules ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithCustomToken, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 
@@ -110,8 +110,18 @@ window.toggleAuthMode = () => {
 // --- Fungsi Reset Password ---
 
 window.openResetModal = () => {
-    document.getElementById('reset-email').value = document.getElementById('email').value; // Copy email jika sudah diketik
-    document.getElementById('reset-modal').classList.remove('hidden');
+    console.log("Membuka Modal Reset..."); // Debugging
+    const emailInput = document.getElementById('email');
+    if(emailInput) {
+        document.getElementById('reset-email').value = emailInput.value; 
+    }
+    const modal = document.getElementById('reset-modal');
+    if(modal) {
+        modal.classList.remove('hidden');
+    } else {
+        console.error("Modal Reset tidak ditemukan! Cek HTML kamu.");
+        alert("Terjadi kesalahan sistem: Modal tidak ditemukan.");
+    }
 }
 
 window.closeResetModal = () => {
@@ -135,7 +145,7 @@ window.handleResetPassword = async (e) => {
         console.error(error);
         alert("Gagal mengirim link: " + getErrorMessage(error.code));
     }
-}
+};
 
 // --- Firestore Functions ---
 

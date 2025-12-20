@@ -23,7 +23,7 @@
                 <i class="fas fa-graduation-cap text-2xl"></i>
                 <div class="flex flex-col">
                     <span class="text-xl font-bold tracking-wide leading-tight">StudentTasks</span>
-                    <span class="text-xs text-indigo-200 font-medium">With Smart Assistant</span>
+                    <span class="text-xs text-indigo-200 font-medium">with TARA Smart Assistant</span>
                 </div>
             </div>
             <div id="user-info" class="hidden flex items-center space-x-4">
@@ -122,7 +122,6 @@
                 <p class="text-gray-500">Belum ada tugas. Klik "Tambah Tugas" untuk memulai!</p>
             </div>
         </div>
-
     </main>
 
     <!-- Footer -->
@@ -177,6 +176,34 @@
                 <div class="pt-2 flex justify-end space-x-3">
                     <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Batal</button>
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+     <!-- MODAL RESET PASSWORD-->
+    <div id="reset-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Reset Password</h3>
+                <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+            </div>
+            <p class="text-gray-500 text-sm mb-4">Masukkan email yang terdaftar. Kami akan mengirimkan link untuk mereset password ke emailmu.</p>
+            
+            <form onsubmit="handleResetPassword(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email" id="reset-email" required class="pl-10 w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border p-2.5" placeholder="nama@siswa.com">
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeResetModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md text-sm font-medium">Kirim Link</button>
                 </div>
             </form>
         </div>
