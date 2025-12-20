@@ -65,6 +65,7 @@ function getErrorMessage(code) {
         case 'auth/invalid-email': return 'Format email tidak valid.';
         case 'auth/user-disabled': return 'Akun ini telah dinonaktifkan.';
         case 'auth/user-not-found': return 'Email tidak ditemukan.';
+        case 'auth/invalid-credential': return 'Email atau Password salah.';
         case 'auth/wrong-password': return 'Password salah.';
         case 'auth/email-already-in-use': return 'Email sudah terdaftar.';
         case 'auth/weak-password': return 'Password terlalu lemah (min 6 karakter).';
