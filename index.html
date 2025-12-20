@@ -117,7 +117,7 @@
             <div id="task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             
             <!-- Empty State -->
-            <div id="empty-state" class="hidden text-center py-12">
+           <div id="empty-state" class="hidden text-center py-12">
                 <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="No Tasks" class="w-32 h-32 mx-auto opacity-50 mb-4">
                 <p class="text-gray-500">Belum ada tugas. Klik "Tambah Tugas" untuk memulai!</p>
             </div>
@@ -235,7 +235,7 @@
             <h3 class="text-lg font-bold text-gray-800 mb-2">Hapus Tugas?</h3>
             <div class="flex justify-center space-x-3 mt-6">
                 <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">Batal</button>
-                <button id="confirm-delete-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md">Ya, Hapus</button>
+                <button id="confirm-delete-btn" onclick="deleteTask()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md">Ya, Hapus</button>
             </div>
         </div>
     </div>

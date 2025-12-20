@@ -15,6 +15,8 @@ const firebaseConfig = {
     measurementId: "G-JYDPZLDHB6"
 };
 
+
+
 // 2. API Key Gemini
 const geminiApiKey = "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc";
 
@@ -176,6 +178,73 @@ window.saveTask = async (e) => {
     } catch (error) { console.error(error); alert("Gagal menyimpan."); }
 };
 
+window.saveTask = async (e) => {
+    e.preventDefault(); // Mencegah reload halaman
+    if (!currentUser) return;
+
+    // 1. Ambil tombol simpan & berikan efek loading
+    const submitBtn = document.querySelector('#task-form button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerText : 'Simpan';
+    
+    // Pastikan tombol ada sebelum diubah
+    if(submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    }
+
+    const title = document.getElementById('task-title').value;
+    const desc = document.getElementById('task-desc').value;
+    const date = document.getElementById('task-date').value;
+    const priority = document.getElementById('task-priority').value;
+    const id = document.getElementById('task-id').value;
+    
+    // Referensi koleksi
+    const tasksCollection = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'tasks');
+
+    try {
+        if (id) {
+            // Mode Edit: Update dokumen yang ada
+            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'tasks', id), { 
+                title, 
+                description: desc, 
+                dueDate: date, 
+                priority, 
+                updatedAt: serverTimestamp() 
+            });
+        } else {
+            // Mode Tambah: Buat dokumen baru
+            await addDoc(tasksCollection, { 
+                title, 
+                description: desc, 
+                dueDate: date, 
+                priority, 
+                isCompleted: false, 
+                createdAt: serverTimestamp() 
+            });
+        }
+        
+        // 2. Tutup Modal Secara Otomatis (Panggil fungsi global window.closeModal)
+        if (typeof window.closeModal === 'function') {
+            window.closeModal();
+        } else {
+            // Fallback manual jika fungsi tidak ditemukan (opsional)
+            const modal = document.getElementById('task-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+        
+    } catch (error) { 
+        console.error("Gagal menyimpan:", error); 
+        alert("Gagal menyimpan: " + error.message); 
+    } finally {
+        // 3. PENTING: Kembalikan tombol ke keadaan semula (aktif kembali)
+        // Ini dijalankan baik sukses maupun gagal
+        if(submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Simpan'; // Kembalikan teks asli (tanpa spinner)
+        }
+    }
+};
+
 window.toggleComplete = async (id, status) => {
     if (!currentUser) return;
     await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'tasks', id), { isCompleted: !status });
@@ -193,11 +262,6 @@ window.generateDescriptionAI = async () => {
     const title = document.getElementById('task-title').value;
     if (!title) {
         alert("Harap isi Judul Tugas terlebih dahulu agar AI bisa membuat rencana.");
-        return;
-    }
-    
-    if (!geminiApiKey || geminiApiKey === "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc") {
-        alert("API Key Gemini belum diisi! Edit file app.js baris 21.");
         return;
     }
 
@@ -223,11 +287,6 @@ window.generateDescriptionAI = async () => {
 window.askAI = async (id) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
-
-    if (!geminiApiKey || geminiApiKey === "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc") {
-        alert("API Key Gemini belum diisi! Edit file app.js baris 21.");
-        return;
-    }
 
     const modal = document.getElementById('ai-modal');
     const content = document.getElementById('ai-content');
