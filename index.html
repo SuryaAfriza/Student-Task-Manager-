@@ -4,32 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Task Management System + AI</title>
-    <!-- Tailwind CSS (Framework Desain) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome (Ikon) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Marked.js (Render Teks AI) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- Link ke File CSS Kustom -->
+    <!-- Google Fonts: Poppins untuk kesan modern & friendly -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    <nav class="bg-indigo-600 text-white shadow-lg sticky top-0 z-50">
+    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-graduation-cap text-2xl"></i>
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-600 text-white p-2 rounded-lg shadow-lg">
+                    <i class="fas fa-graduation-cap text-xl"></i>
+                </div>
                 <div class="flex flex-col">
-                    <span class="text-xl font-bold tracking-wide leading-tight">StudentTasks</span>
-                    <span class="text-xs text-indigo-200 font-medium">with TARA Smart Assistant</span>
+                    <span class="text-xl font-bold tracking-tight text-gray-900 leading-none">Student<span class="text-brand-600">Tasks</span></span>
+                    <span class="text-xs text-gray-500 font-medium mt-0.5 flex items-center">
+                        <i class="fas fa-sparkles text-yellow-400 mr-1"></i> with TARA Smart Assistant
+                    </span>
                 </div>
             </div>
             <div id="user-info" class="hidden flex items-center space-x-4">
-                <span id="user-email" class="text-sm font-medium opacity-90 hidden sm:inline"></span>
-                <button onclick="handleLogout()" class="bg-indigo-700 hover:bg-indigo-800 px-3 py-1 rounded transition text-sm">
-                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span>
+                <div class="flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span id="user-email" class="text-sm font-medium text-gray-700 hidden sm:inline"></span>
+                </div>
+                <button onclick="handleLogout()" class="text-gray-500 hover:text-red-600 transition p-2 rounded-full hover:bg-red-50">
+                    <i class="fas fa-sign-out-alt text-lg"></i>
                 </button>
             </div>
         </div>
@@ -37,210 +61,341 @@
 
     <!-- Main Container -->
     <main class="flex-grow container mx-auto px-4 py-8 relative">
-
-        <!-- Loading State -->
         <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex flex-col justify-center items-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mb-4"></div>
-            <p class="text-gray-500">Memuat Sistem...</p>
+            <div class="relative">
+                <div class="w-16 h-16 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <i class="fas fa-book text-brand-600"></i>
+                </div>
+            </div>
+            <p class="text-gray-500 mt-4 font-medium animate-pulse">Menyiapkan Ruang Belajarmu...</p>
         </div>
 
         <!-- Auth Section -->
-        <div id="auth-container" class="hidden max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden fade-in mt-10">
-            <div class="p-8">
-                <div class="text-center mb-6">
-                    <h2 id="auth-title" class="text-2xl font-bold text-gray-800">Login Mahasiswa</h2>
-                    <p class="text-gray-500 text-sm mt-1">Kelola tugas kuliahmu dengan mudah</p>
+        <div id="auth-container" class="hidden min-h-[80vh] flex items-center justify-center">
+            <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+                <!-- Left Side: Hero Image/Illustration -->
+                <div class="md:w-1/2 bg-gradient-to-br from-brand-600 to-indigo-700 p-8 flex flex-col justify-between text-white relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-yellow-400 opacity-20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+                    
+                    <div class="relative z-10">
+                        <h1 class="text-3xl font-bold mb-2">Atur Tugas Kuliah Jadi Lebih Mudah 🚀</h1>
+                        <p class="text-brand-100 text-sm leading-relaxed">Jangan biarkan deadline menghantuimu. Gunakan StudentTasks dengan bantuan AI untuk merencanakan studimu.</p>
+                    </div>
+                    
+                    <div class="mt-8 relative z-10 text-center">
+                        <i class="fas fa-shapes text-8xl opacity-20 animate-float"></i>
+                    </div>
+
+                    <div class="relative z-10 mt-auto pt-8">
+                        <div class="flex items-center space-x-2 text-xs text-brand-200">
+                            <i class="fas fa-check-circle"></i>
+                            <span>AI Planner & Tutor</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs text-brand-200 mt-1">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Prioritas & Deadline</span>
+                        </div>
+                    </div>
                 </div>
-                <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="email" required class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border p-2.5" placeholder="nama@siswa.com">
+
+                <!-- Right Side: Form -->
+                <div class="md:w-1/2 p-8 md:p-12 bg-white flex flex-col justify-center">
+                    <div class="text-center mb-8">
+                        <h2 id="auth-title" class="text-2xl font-bold text-gray-900">Selamat Datang! 👋</h2>
+                        <p class="text-gray-500 text-sm mt-1">Silakan masuk untuk melihat tugasmu.</p>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="password" required class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border p-2.5" placeholder="••••••••">
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="button" onclick="openResetModal()" class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline font-medium focus:outline-none">
-                            Lupa Password?
+
+                    <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Email Mahasiswa</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="far fa-envelope"></i>
+                                </span>
+                                <input type="email" id="email" required class="pl-10 w-full border border-gray-200 rounded-xl bg-gray-50 px-4 py-3 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all outline-none text-sm" placeholder="nama@kampus.ac.id">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" id="password" required class="pl-10 w-full border border-gray-200 rounded-xl bg-gray-50 px-4 py-3 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all outline-none text-sm" placeholder="••••••••">
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button type="button" onclick="openResetModal()" class="text-xs text-brand-600 hover:text-brand-800 font-medium hover:underline">
+                                Lupa Password?
+                            </button>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl transition-all shadow-lg shadow-brand-500/30 active:scale-95 flex justify-center items-center group">
+                            <span>Masuk Sekarang</span>
+                            <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
                         </button>
+                    </form>
+
+                    <div class="mt-8 pt-6 border-t border-gray-100 text-center">
+                        <p class="text-sm text-gray-600">
+                            <span id="auth-switch-text">Belum punya akun?</span>
+                            <button onclick="toggleAuthMode()" class="text-brand-600 hover:text-brand-800 font-bold ml-1 focus:outline-none">
+                                Daftar Gratis
+                            </button>
+                        </p>
                     </div>
-                    <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg transition shadow-md">Masuk</button>
-                </form>
-                <div class="mt-6 text-center">
-                    <button onclick="toggleAuthMode()" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm">
-                        <span id="auth-switch-text">Belum punya akun? Daftar sekarang</span>
-                    </button>
+                    <div id="auth-error" class="hidden mt-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-r-lg text-sm flex items-start">
+                        <i class="fas fa-exclamation-circle mt-0.5 mr-2"></i>
+                        <span id="auth-error-msg"></span>
+                    </div>
                 </div>
-                <div id="auth-error" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded text-sm text-center"></div>
             </div>
         </div>
 
         <!-- Dashboard Section -->
-        <div id="dashboard-container" class="hidden fade-in">
-            <!-- Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <button onclick="openModal()" class="md:col-span-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl shadow-md p-4 flex items-center justify-center space-x-2 transition transform hover:scale-105">
-                    <div class="bg-white/20 rounded-full p-2"><i class="fas fa-plus"></i></div>
-                    <span class="font-bold text-lg">Tambah Tugas</span>
-                </button>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
-                    <div><p class="text-xs text-gray-500 uppercase font-semibold">Total</p><p id="total-tasks" class="text-2xl font-bold">0</p></div>
-                    <i class="fas fa-tasks text-blue-200 text-3xl"></i>
+        <div id="dashboard-container" class="hidden fade-in space-y-8">
+            
+            <!-- Progress Section (Gamifikasi) -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full -mr-10 -mt-10"></div>
+                <div class="flex justify-between items-end mb-2 relative z-10">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Progress Belajarmu 📚</h2>
+                        <p class="text-gray-500 text-sm">Selesaikan tugas untuk menaikkan level!</p>
+                    </div>
+                    <span id="progress-text" class="text-2xl font-bold text-brand-600">0%</span>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-yellow-500 flex justify-between items-center">
-                    <div><p class="text-xs text-gray-500 uppercase font-semibold">Pending</p><p id="pending-tasks" class="text-2xl font-bold">0</p></div>
-                    <i class="fas fa-clock text-yellow-200 text-3xl"></i>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-green-500 flex justify-between items-center">
-                    <div><p class="text-xs text-gray-500 uppercase font-semibold">Selesai</p><p id="completed-tasks" class="text-2xl font-bold">0</p></div>
-                    <i class="fas fa-check-circle text-green-200 text-3xl"></i>
+                <div class="w-full bg-gray-100 rounded-full h-3 relative z-10">
+                    <div id="progress-bar" class="bg-gradient-to-r from-brand-500 to-green-400 h-3 rounded-full transition-all duration-1000 ease-out" style="width: 0%"></div>
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-list-ul mr-2 text-indigo-500"></i> Daftar Tugas
-                </h2>
-                <div class="flex space-x-2">
-                    <select id="filter-priority" onchange="filterTasks()" class="border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="all">Semua Prioritas</option>
-                        <option value="Tinggi">Tinggi</option>
-                        <option value="Sedang">Sedang</option>
-                        <option value="Rendah">Rendah</option>
-                    </select>
+            <!-- Stats & Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <button onclick="openModal()" class="md:col-span-1 bg-gradient-to-br from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center space-y-3 transition transform hover:-translate-y-1 hover:shadow-xl group border border-transparent">
+                    <div class="bg-white/20 p-3 rounded-full group-hover:rotate-90 transition-transform duration-300">
+                        <i class="fas fa-plus text-2xl"></i>
+                    </div>
+                    <span class="font-bold text-lg">Tugas Baru</span>
+                </button>
+
+                <!-- Cards Statistik dengan Desain Baru -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:border-blue-200 transition">
+                    <div>
+                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Total Tugas</p>
+                        <p id="total-tasks" class="text-3xl font-bold text-gray-800 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition">
+                        <i class="fas fa-folder-open text-xl"></i>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:border-yellow-200 transition">
+                    <div>
+                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Pending</p>
+                        <p id="pending-tasks" class="text-3xl font-bold text-gray-800 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-500 group-hover:scale-110 transition">
+                        <i class="fas fa-clock text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:border-green-200 transition">
+                    <div>
+                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Selesai</p>
+                        <p id="completed-tasks" class="text-3xl font-bold text-gray-800 mt-1">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-500 group-hover:scale-110 transition">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters & Header List -->
+            <div class="flex flex-col sm:flex-row justify-between items-end border-b border-gray-200 pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                        Daftar Tugas <span class="ml-2 text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded-md border border-gray-200" id="task-count-badge">0</span>
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1">Kelola dan selesaikan tugas-tugasmu.</p>
+                </div>
+                <div class="mt-4 sm:mt-0 flex space-x-2">
+                    <div class="relative">
+                        <select id="filter-priority" onchange="filterTasks()" class="appearance-none bg-white border border-gray-300 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer hover:border-brand-400 transition">
+                            <option value="all">Semua Prioritas</option>
+                            <option value="Tinggi">🔥 Prioritas Tinggi</option>
+                            <option value="Sedang">⚡ Prioritas Sedang</option>
+                            <option value="Rendah">☕ Prioritas Rendah</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Task List -->
-            <div id="task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             
-            <!-- Empty State -->
-           <div id="empty-state" class="hidden text-center py-12">
-                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="No Tasks" class="w-32 h-32 mx-auto opacity-50 mb-4">
-                <p class="text-gray-500">Belum ada tugas. Klik "Tambah Tugas" untuk memulai!</p>
+            <!-- Empty State (Lebih Menarik) -->
+            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-16 text-center bg-white rounded-3xl border border-dashed border-gray-300">
+                <div class="bg-gray-50 p-6 rounded-full mb-4 animate-bounce-slow">
+                    <i class="fas fa-clipboard-list text-4xl text-gray-300"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800">Tugas masih kosong!</h3>
+                <p class="text-gray-500 text-sm max-w-xs mx-auto mt-1 mb-6">Nikmati waktu luangmu atau mulai tambahkan tugas baru agar lebih produktif.</p>
+                <button onclick="openModal()" class="text-brand-600 font-semibold text-sm hover:underline">
+                    + Tambah Tugas Sekarang
+                </button>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t py-4 mt-auto">
-        <div class="container mx-auto text-center text-gray-500 text-sm">
-            &copy; 2025 StudentTasks.
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+        <div class="container mx-auto text-center">
+            <p class="text-gray-500 text-sm font-medium">© 2025 StudentTasks Group Project.</p>
         </div>
     </footer>
 
-    <!-- Modal Form (Add/Edit Task) -->
-    <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg transform transition-all scale-100">
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 id="modal-title" class="text-xl font-bold text-gray-800">Tambah Tugas Baru</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-xl"></i></button>
+    <!-- Task Modal (Formulir) -->
+    <div id="task-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all scale-100 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+                <div>
+                    <h3 id="modal-title" class="text-xl font-bold text-gray-800">Tambah Tugas</h3>
+                    <p class="text-xs text-gray-500">Isi detail tugas kuliahmu di bawah ini.</p>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-gray-200 text-gray-500 hover:bg-red-100 hover:text-red-500 flex items-center justify-center transition">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             
-            <form id="task-form" onsubmit="saveTask(event)" class="p-6 space-y-4">
-                <input type="hidden" id="task-id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul Tugas</label>
-                    <input type="text" id="task-title" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Contoh: Belajar Biologi Bab Sel">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-sm font-medium text-gray-700">Deskripsi / Rencana Belajar</label>
-                        <button type="button" onclick="generateDescriptionAI()" class="text-xs bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded-full transition flex items-center border border-purple-200">
-                            <i class="fas fa-magic mr-1"></i> ✨ Buat Rencana dengan TARA
-                        </button>
+            <div class="overflow-y-auto p-6">
+                <form id="task-form" onsubmit="saveTask(event)" class="space-y-5">
+                    <input type="hidden" id="task-id">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Judul Tugas <span class="text-red-500">*</span></label>
+                        <input type="text" id="task-title" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm" placeholder="Contoh: Makalah Etika Profesi Bab 1">
                     </div>
-                    <div class="relative">
-                        <textarea id="task-desc" rows="4" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="Ketik judul, lalu klik tombol AI di atas untuk dibuatkan rencana belajar otomatis..."></textarea>
-                        <div id="ai-loading-input" class="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg hidden">
-                            <span class="text-purple-600 text-sm font-bold animate-pulse">✨ TARA sedang berpikir...</span>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="block text-sm font-semibold text-gray-700">Deskripsi & Rencana</label>
+                            <button type="button" onclick="generateDescriptionAI()" class="text-xs bg-purple-100 text-purple-700 hover:bg-purple-200 px-3 py-1.5 rounded-full transition flex items-center border border-purple-200 font-medium group">
+                                <i class="fas fa-magic mr-1.5 group-hover:rotate-12 transition-transform"></i> Buat Rencana dengan TARA
+                            </button>
+                        </div>
+                        <div class="relative group">
+                            <textarea id="task-desc" rows="4" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm resize-none" placeholder="Tulis detail tugas atau gunakan tombol AI di atas untuk membuat rencana otomatis..."></textarea>
+                            <div id="ai-loading-input" class="absolute inset-0 bg-white/90 backdrop-blur-[1px] flex flex-col items-center justify-center rounded-xl hidden border border-purple-100">
+                                <div class="animate-spin text-purple-600 text-2xl mb-2"><i class="fas fa-circle-notch"></i></div>
+                                <span class="text-purple-700 text-sm font-bold animate-pulse">TARA sedang berpikir...</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tenggat Waktu</label>
-                        <input type="date" id="task-date" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Deadline <span class="text-red-500">*</span></label>
+                            <input type="date" id="task-date" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm text-gray-600">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Prioritas</label>
+                            <div class="relative">
+                                <select id="task-priority" class="w-full appearance-none border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm bg-white cursor-pointer">
+                                    <option value="Rendah">Rendah</option>
+                                    <option value="Sedang">Sedang</option>
+                                    <option value="Tinggi">Tinggi</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Prioritas</label>
-                        <select id="task-priority" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="Rendah">Rendah</option>
-                            <option value="Sedang">Sedang</option>
-                            <option value="Tinggi">Tinggi</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="pt-2 flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md">Simpan</button>
-                </div>
-            </form>
+                </form>
+            </div>
+
+            <div class="p-5 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end space-x-3">
+                <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition text-sm font-medium">Batal</button>
+                <button onclick="document.getElementById('submit-task-btn').click()" class="px-5 py-2.5 bg-brand-600 text-white rounded-xl hover:bg-brand-700 transition shadow-md text-sm font-bold flex items-center">
+                    <i class="fas fa-save mr-2"></i> Simpan Tugas
+                </button>
+                <!-- Hidden button to trigger form submit -->
+                <button id="submit-task-btn" form="task-form" type="submit" class="hidden"></button>
+            </div>
         </div>
     </div>
 
-     <!-- MODAL RESET PASSWORD-->
-    <div id="reset-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-800">Reset Password</h3>
-                <button onclick="closeResetModal()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+    <!-- MODAL RESET PASSWORD -->
+    <div id="reset-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-100">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-brand-600 text-xl">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">Reset Password</h3>
+                <p class="text-gray-500 text-sm mt-1">Jangan khawatir, kami akan mengirimkan link pemulihan ke emailmu.</p>
             </div>
-            <p class="text-gray-500 text-sm mb-4">Masukkan email yang terdaftar. Kami akan mengirimkan link untuk mereset password ke emailmu.</p>
             
-            <form onsubmit="handleResetPassword(event)">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                            <i class="fas fa-envelope"></i>
-                        </span>
-                        <input type="email" id="reset-email" required class="pl-10 w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 border p-2.5" placeholder="nama@siswa.com">
-                    </div>
+            <form onsubmit="handleResetPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Email Terdaftar</label>
+                    <input type="email" id="reset-email" required class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none text-sm" placeholder="nama@email.com">
                 </div>
                 
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeResetModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-md text-sm font-medium">Kirim Link</button>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeResetModal()" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition text-sm font-medium">Batal</button>
+                    <button type="submit" class="flex-1 px-4 py-2.5 bg-brand-600 text-white rounded-xl hover:bg-brand-700 transition shadow-md text-sm font-bold">Kirim Link</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- AI Result Modal (For Tips) -->
-    <div id="ai-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col transform transition-all scale-100">
-            <div class="flex justify-between items-center p-5 border-b bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-xl">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-robot text-purple-600 text-xl"></i>
-                    <h3 class="text-xl font-bold text-gray-800">Saran AI Tutor</h3>
+    <!-- AI Result Modal -->
+    <div id="ai-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col transform transition-all scale-100 overflow-hidden border border-purple-100">
+            <div class="p-5 border-b border-gray-100 bg-gradient-to-r from-purple-50 via-white to-purple-50 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-purple-100 p-2 rounded-lg text-purple-600">
+                        <i class="fas fa-robot text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">Saran TARA</h3>
+                        <p class="text-xs text-purple-600 font-medium">Tips personal untuk tugasmu</p>
+                    </div>
                 </div>
-                <button onclick="closeAIModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-xl"></i></button>
+                <button onclick="closeAIModal()" class="text-gray-400 hover:text-gray-600 transition p-2"><i class="fas fa-times text-lg"></i></button>
             </div>
-            <div id="ai-content" class="p-6 overflow-y-auto text-sm text-gray-700 leading-relaxed prose prose-purple w-full max-w-none"></div>
-            <div class="p-4 border-t bg-gray-50 rounded-b-xl flex justify-end">
-                <button onclick="closeAIModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition shadow-sm text-sm font-medium">Tutup</button>
+            <div id="ai-content" class="p-8 overflow-y-auto text-sm text-gray-700 leading-relaxed prose prose-purple w-full max-w-none bg-white"></div>
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <button onclick="closeAIModal()" class="px-6 py-2.5 bg-brand-600 text-white rounded-xl hover:bg-brand-700 transition shadow-sm text-sm font-medium">Mengerti, Terima Kasih!</button>
             </div>
         </div>
     </div>
 
     <!-- Delete Modal -->
-    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-trash-alt text-red-500 text-xl"></i>
+    <div id="delete-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center transform transition-all scale-100">
+            <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 animate-pulse-slow">
+                <i class="fas fa-trash-alt text-2xl"></i>
             </div>
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Hapus Tugas?</h3>
-            <div class="flex justify-center space-x-3 mt-6">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg">Batal</button>
-                <button id="confirm-delete-btn" onclick="deleteTask()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-md">Ya, Hapus</button>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Hapus Tugas Ini?</h3>
+            <p class="text-gray-500 text-sm mb-6 px-4">Tindakan ini tidak bisa dibatalkan. Tugas akan hilang dari daftar.</p>
+            <div class="flex justify-center space-x-3">
+                <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition text-sm font-medium">Jangan</button>
+                <button id="confirm-delete-btn" onclick="deleteTask()" class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 shadow-md text-sm font-bold flex justify-center items-center">
+                    Ya, Hapus
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Script Logic -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
