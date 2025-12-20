@@ -155,7 +155,7 @@ window.generateDescriptionAI = async () => {
         return;
     }
     
-    if (!geminiApiKey || geminiApiKey === "ISI_GEMINI_API_KEY_DISINI") {
+    if (!geminiApiKey || geminiApiKey === "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc") {
         alert("API Key Gemini belum diisi! Edit file app.js baris 21.");
         return;
     }
@@ -183,7 +183,7 @@ window.askAI = async (id) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
-    if (!geminiApiKey || geminiApiKey === "ISI_GEMINI_API_KEY_DISINI") {
+    if (!geminiApiKey || geminiApiKey === "AIzaSyACWbTkRI0yNofdE850a_GPVEju4c3lvZc") {
         alert("API Key Gemini belum diisi! Edit file app.js baris 21.");
         return;
     }
