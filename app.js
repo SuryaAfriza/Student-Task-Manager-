@@ -107,6 +107,36 @@ window.toggleAuthMode = () => {
     document.getElementById('auth-switch-text').innerText = isLoginMode ? 'Belum punya akun? Daftar sekarang' : 'Sudah punya akun? Login disini';
 };
 
+// --- Fungsi Reset Password ---
+
+window.openResetModal = () => {
+    document.getElementById('reset-email').value = document.getElementById('email').value; // Copy email jika sudah diketik
+    document.getElementById('reset-modal').classList.remove('hidden');
+}
+
+window.closeResetModal = () => {
+    document.getElementById('reset-modal').classList.add('hidden');
+}
+
+window.handleResetPassword = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('reset-email').value;
+    
+    if (!email) {
+        alert("Mohon masukkan email.");
+        return;
+    }
+
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alert(`Link reset password telah dikirim ke: ${email}\nSilakan cek inbox atau folder spam emailmu.`);
+        closeResetModal();
+    } catch (error) {
+        console.error(error);
+        alert("Gagal mengirim link: " + getErrorMessage(error.code));
+    }
+}
+
 // --- Firestore Functions ---
 
 function loadTasks() {
