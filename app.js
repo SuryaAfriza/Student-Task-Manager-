@@ -83,30 +83,66 @@ window.handleAuth = async (e) => {
     const password = document.getElementById('password').value;
     const btn = document.getElementById('submit-btn');
     const err = document.getElementById('auth-error');
+    const errorMsg = document.getElementById('auth-error-msg');
     
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
     err.classList.add('hidden');
 
     try {
-        if (isLoginMode) await signInWithEmailAndPassword(auth, email, password);
-        else await createUserWithEmailAndPassword(auth, email, password);
+        if (isLoginMode) {
+            await signInWithEmailAndPassword(auth, email, password);
+        } else {
+            await createUserWithEmailAndPassword(auth, email, password);
+        }
     } catch (error) {
-        err.innerText = getErrorMessage(error.code);
+        if (errorMsg) errorMsg.innerText = getErrorMessage(error.code);
+        else err.innerText = getErrorMessage(error.code);
         err.classList.remove('hidden');
     } finally {
         btn.disabled = false;
-        btn.innerText = isLoginMode ? 'Masuk' : 'Daftar';
+        // Kembalikan teks tombol sesuai mode yang aktif
+        if (isLoginMode) {
+            btn.innerHTML = '<span>Masuk Sekarang</span><i class="fas fa-arrow-right ml-2"></i>';
+        } else {
+            btn.innerHTML = '<span>Daftar Akun</span><i class="fas fa-user-plus ml-2"></i>';
+        }
     }
 };
 
 window.handleLogout = () => signOut(auth);
 
 window.toggleAuthMode = () => {
-    isLoginMode = !isLoginMode;
-    document.getElementById('auth-title').innerText = isLoginMode ? 'Login Mahasiswa' : 'Daftar Akun Baru';
-    document.getElementById('submit-btn').innerText = isLoginMode ? 'Masuk' : 'Daftar';
-    document.getElementById('auth-switch-text').innerText = isLoginMode ? 'Belum punya akun? Daftar sekarang' : 'Sudah punya akun? Login disini';
+    isLoginMode = !isLoginMode; // Balik status (Login <-> Daftar)
+    
+    const title = document.getElementById('auth-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const switchText = document.getElementById('auth-switch-text');
+    const switchBtn = document.getElementById('auth-switch-btn');
+    const errorDiv = document.getElementById('auth-error');
+
+    // Sembunyikan error jika ada
+    if(errorDiv) errorDiv.classList.add('hidden');
+
+    if (isLoginMode) {
+        // Jika mode LOGIN aktif:
+        title.innerText = 'Selamat Datang! 👋';
+        submitBtn.innerHTML = '<span>Masuk Sekarang</span><i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>';
+        
+        // Teks bantu: "Belum punya akun?"
+        switchText.innerText = 'Belum punya akun?';
+        // Tombol switch: "Daftar Gratis"
+        switchBtn.innerText = 'Daftar dulu yuk';
+    } else {
+        // Jika mode DAFTAR aktif:
+        title.innerText = 'Buat Akun Baru 🚀';
+        submitBtn.innerHTML = '<span>Daftar Akun</span><i class="fas fa-user-plus ml-2 transform group-hover:translate-x-1 transition-transform"></i>';
+        
+        // Teks bantu: "Sudah punya akun?"
+        switchText.innerText = 'Sudah punya akun?';
+        // Tombol switch: "Login Disini"
+        switchBtn.innerText = 'Login disini';
+    }
 };
 
 // --- Fungsi Reset Password ---
@@ -341,11 +377,17 @@ async function callGeminiAPI(userPrompt) {
 window.renderTasks = () => {
     const container = document.getElementById('task-list');
     const filterValue = document.getElementById('filter-priority').value;
+    const badgeCount = document.getElementById('task-count-badge'); // Badge jumlah
+    
     container.innerHTML = '';
 
     let filtered = tasks;
     if (filterValue !== 'all') filtered = tasks.filter(t => t.priority === filterValue);
     
+    // Update Badge
+    if (badgeCount) badgeCount.innerText = filtered.length;
+
+    // Sorting: Belum selesai di atas, lalu berdasarkan tanggal deadline terdekat
     filtered.sort((a, b) => (a.isCompleted - b.isCompleted) || new Date(a.dueDate) - new Date(b.dueDate));
 
     if (filtered.length === 0) {
@@ -355,23 +397,38 @@ window.renderTasks = () => {
     document.getElementById('empty-state').classList.add('hidden');
 
     filtered.forEach(task => {
-        const isLate = !task.isCompleted && new Date(task.dueDate) < new Date().setHours(0,0,0,0);
-        const priorityColor = task.priority === 'Tinggi' ? 'bg-red-500' : (task.priority === 'Sedang' ? 'bg-yellow-500' : 'bg-blue-500');
+        // Logika Status Deadline
+        const today = new Date().setHours(0,0,0,0);
+        const due = new Date(task.dueDate).setHours(0,0,0,0);
+        const isLate = !task.isCompleted && due < today;
+        const isToday = !task.isCompleted && due === today;
         
+        // Warna Prioritas (Badge)
+        let priorityBadge = '';
+        if(task.priority === 'Tinggi') priorityBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-600 border border-red-200"> Tinggi</span>';
+        else if(task.priority === 'Sedang') priorityBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-600 border border-yellow-200"> Sedang</span>';
+        else priorityBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-600 border border-blue-200"> Rendah</span>';
+
+        // Border Kiri Warna
+        const borderClass = task.isCompleted ? 'border-l-4 border-l-green-400' : (task.priority === 'Tinggi' ? 'border-l-4 border-l-red-500' : (task.priority === 'Sedang' ? 'border-l-4 border-l-yellow-400' : 'border-l-4 border-l-blue-400'));
+        const bgClass = task.isCompleted ? 'bg-gray-50' : 'bg-white';
+        const opacityClass = task.isCompleted ? 'opacity-75 grayscale-[0.5]' : '';
+
         const div = document.createElement('div');
-        div.className = `bg-white rounded-xl shadow-sm border border-gray-100 p-5 transition hover:shadow-md relative group ${task.isCompleted ? 'opacity-75 bg-gray-50' : ''}`;
+        div.className = `task-card ${bgClass} ${borderClass} ${opacityClass} rounded-2xl p-5 shadow-sm border-t border-r border-b border-gray-100 relative group flex flex-col h-full`;
+        
         div.innerHTML = `
-            <div class="absolute top-0 left-0 w-1 h-full ${priorityColor}"></div>
-            <div class="flex justify-between items-start mb-2">
-                <span class="text-xs font-bold px-2 py-1 rounded bg-gray-100 text-gray-600 uppercase tracking-wide">${task.priority}</span>
-                <div class="flex space-x-1">
-                    <button onclick="editTask('${task.id}')" class="text-gray-400 hover:text-indigo-600 p-1"><i class="fas fa-edit"></i></button>
-                    <button onclick="confirmDelete('${task.id}')" class="text-gray-400 hover:text-red-600 p-1"><i class="fas fa-trash"></i></button>
+            <div class="flex justify-between items-start mb-3">
+                ${priorityBadge}
+                <div class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button onclick="editTask('${task.id}')" class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"><i class="fas fa-edit"></i></button>
+                    <button onclick="confirmDelete('${task.id}')" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
-            <h3 class="font-bold text-lg text-gray-800 mb-1 ${task.isCompleted ? 'line-through text-gray-500' : ''}">${escapeHtml(task.title)}</h3>
-            <p class="text-gray-600 text-sm mb-4 line-clamp-2 h-10">${escapeHtml(task.description || '-')}</p>
             
+            <h3 class="font-bold text-gray-800 text-lg mb-2 leading-tight ${task.isCompleted ? 'line-through text-gray-500' : ''}">${escapeHtml(task.title)}</h3>
+            <p class="text-gray-500 text-sm mb-4 line-clamp-2 flex-grow">${escapeHtml(task.description || 'Tidak ada catatan tambahan.')}</p>
+        
             <button onclick="askAI('${task.id}')" class="w-full mb-3 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 text-purple-700 text-xs font-bold py-1.5 rounded border border-purple-100 flex items-center justify-center space-x-1 transition">
                 <i class="fas fa-sparkles text-yellow-500"></i>
                 <span>Tips AI Tutor</span>
@@ -388,6 +445,16 @@ window.renderTasks = () => {
         `;
         container.appendChild(div);
     });
+};
+
+window.updateStats = () => {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.isCompleted).length;
+    const pending = total - completed;
+    
+    document.getElementById('total-tasks').innerText = total;
+    document.getElementById('pending-tasks').innerText = pending;
+    document.getElementById('completed-tasks').innerText = completed;
 };
 
 window.openModal = () => {
@@ -415,11 +482,73 @@ window.editTask = (id) => {
 window.confirmDelete = (id) => { taskToDeleteId = id; document.getElementById('delete-modal').classList.remove('hidden'); };
 window.closeDeleteModal = () => document.getElementById('delete-modal').classList.add('hidden');
 window.filterTasks = () => window.renderTasks();
-window.updateStats = () => {
-    document.getElementById('total-tasks').innerText = tasks.length;
-    document.getElementById('pending-tasks').innerText = tasks.filter(t => !t.isCompleted).length;
-    document.getElementById('completed-tasks').innerText = tasks.filter(t => t.isCompleted).length;
-};
 
 function formatDate(d) { if(!d) return '-'; return new Date(d).toLocaleDateString('id-ID', {day:'numeric', month:'short'}); }
 function escapeHtml(t) { if(!t) return ""; return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+// --- POMODORO TIMER LOGIC ---
+let pomoTimer = null;
+let pomoTimeLeft = 25 * 60;
+let isPomoRunning = false;
+let pomoTotalTime = 25 * 60;
+
+window.togglePomodoro = () => {
+    const btnIcon = document.querySelector('#pomo-btn i');
+    
+    if (isPomoRunning) {
+        clearInterval(pomoTimer);
+        isPomoRunning = false;
+        btnIcon.classList.remove('fa-pause');
+        btnIcon.classList.add('fa-play', 'ml-0.5'); // Kembalikan posisi play
+    } else {
+        isPomoRunning = true;
+        btnIcon.classList.remove('fa-play', 'ml-0.5');
+        btnIcon.classList.add('fa-pause', 'ml-0');
+        
+        pomoTimer = setInterval(() => {
+            if (pomoTimeLeft > 0) {
+                pomoTimeLeft--;
+                updatePomoDisplay();
+            } else {
+                clearInterval(pomoTimer);
+                isPomoRunning = false;
+                btnIcon.classList.remove('fa-pause');
+                btnIcon.classList.add('fa-play', 'ml-0.5');
+                alert("Waktu Habis! Istirahat dulu.");
+            }
+        }, 1000);
+    }
+};
+
+window.resetPomodoro = () => {
+    clearInterval(pomoTimer);
+    isPomoRunning = false;
+    pomoTimeLeft = pomoTotalTime;
+    updatePomoDisplay();
+    const btnIcon = document.querySelector('#pomo-btn i');
+    if(btnIcon) {
+        btnIcon.classList.remove('fa-pause');
+        btnIcon.classList.add('fa-play', 'ml-0.5');
+    }
+};
+
+window.setMode = (minutes) => {
+    clearInterval(pomoTimer);
+    isPomoRunning = false;
+    pomoTotalTime = minutes * 60;
+    pomoTimeLeft = pomoTotalTime;
+    updatePomoDisplay();
+    const btnIcon = document.querySelector('#pomo-btn i');
+    if(btnIcon) {
+        btnIcon.classList.remove('fa-pause');
+        btnIcon.classList.add('fa-play', 'ml-0.5');
+    }
+};
+
+function updatePomoDisplay() {
+    const minutes = Math.floor(pomoTimeLeft / 60);
+    const seconds = pomoTimeLeft % 60;
+    const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const displayEl = document.getElementById('pomo-display');
+    if(displayEl) displayEl.innerText = display;
+}
