@@ -68,7 +68,7 @@ Jika ingin menjalankan kode sumber di laptop sendiri:
 1. **Clone Repository ini:**
 
    ```bash
-   git clone [https://github.com/USERNAME_KAMU/student-task-manager.git](https://github.com/USERNAME_KAMU/student-task-manager.git)
+   git clone https://github.com/SuryaAfriza/student-task-manager.git
 
 2. **Masuk ke Folder Proyek:** Buka folder hasil download di text editor (VS Code disarankan).
 
@@ -85,3 +85,4 @@ Jika ingin menjalankan kode sumber di laptop sendiri:
    * Buka file `index.html` langsung di browser.
 
    * Atau gunakan ekstensi "Live Server" di VS Code untuk pengalaman yang lebih baik.
+
